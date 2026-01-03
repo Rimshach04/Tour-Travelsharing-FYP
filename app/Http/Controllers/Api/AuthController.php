@@ -8,6 +8,10 @@ use App\Models\Userregester;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;                  
+use Illuminate\Support\Facades\DB;   
+use Carbon\Carbon;                    
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {

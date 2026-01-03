@@ -16,7 +16,10 @@
     <p class="ppp"><strong>Price:</strong> <span id="tour-price"></span></p>
     </div>
     <hr>
-         
+    <h4>Description</h4>
+    <p>{{ request('description') }}</p>
+    
+
    
 
 

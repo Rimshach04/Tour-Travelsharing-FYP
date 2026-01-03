@@ -4,18 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Feedback extends Model
+class Feedbacktable extends Model
 {
-    protected $table = 'feedbacks';
+    protected $table = 'feedbacktable';
     protected $fillable = [
+        // 'user_id',
         'user_id',
         'name',
         'rating',
         'message'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

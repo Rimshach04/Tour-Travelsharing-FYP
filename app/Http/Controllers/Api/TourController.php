@@ -70,7 +70,7 @@ class TourController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token sahi nahi h.'
+                'message' => 'Token not valid.'
             ], 401);
         }
 

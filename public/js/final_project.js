@@ -76,15 +76,7 @@ document.querySelector(".SignForm form").addEventListener("submit", async (e) =>
     alert("Something went wrong! Please try again.");
   }
 });
-// fetch('https://yourapi.com/api/some-endpoint', {
-//   method: 'GET',
-//   headers: {
-//     'Authorization': 'Bearer YOUR_TOKEN_HERE',
-//     'Content-Type': 'application/json'
-//   }
-// })
-// .then(res => res.json())
-// .then(data => console.log(data));
+
 
 
 // 🔹 Login
@@ -116,7 +108,7 @@ document.querySelector(".LoginForm form").addEventListener("submit", async (e) =
       // ✅ Store access token for later API calls
       localStorage.setItem("token", data.access_token);
       alert("Login successful!");
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } else {
       alert(data.message || "Invalid credentials");
     }
@@ -126,6 +118,31 @@ document.querySelector(".LoginForm form").addEventListener("submit", async (e) =
     console.error(err);
   }
 });
+          //logout 
+document.addEventListener("DOMContentLoaded", function () {
+  const token = localStorage.getItem("token");
+
+  const loginBtn = document.querySelector(".login-btn");
+  const logoutBtn = document.querySelector(".logout-btn");
+
+  if (token) {
+    // User logged in → show Logout
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+  } else {
+    // User not logged in → show Login
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+  }
+});
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/"; // redirect to login page
+}
+
+
+
+
 
     // *********************************************************
                 //    tour list
@@ -156,51 +173,127 @@ function moveSlide(slideIndex) {
   dots.forEach(dot => dot.classList.remove("active"));
   dots[slideIndex].classList.add("active");
 }
-                
-                    document.querySelectorAll(".tour-card").forEach(card => {
-                        card.addEventListener("click", () => {
-                          let title = encodeURIComponent(card.dataset.title);
-                          let duration = encodeURIComponent(card.dataset.duration);
-                          let price = encodeURIComponent(card.dataset.price);
-                        
-           window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}`;
-                        });
-                      });
 
+   
                       //************************************************ */
 
                     //   ride share
                    
-                    const bookBtns = document.querySelectorAll(".book-btn");
-                    const formOverlays = document.querySelectorAll(".form-overlay");
-                    const mapBtns = document.querySelectorAll(".map-btn");
-                    const mapOverlays = document.querySelectorAll(".map-overlay");
-                    const closeButton = document.querySelectorAll(".close-btn");
+   const bookBtns = document.querySelectorAll(".book-btn");
+   const formOverlays = document.querySelectorAll(".form-overlay");
+  const mapBtns = document.querySelectorAll(".map-btn");
+  const mapOverlays = document.querySelectorAll(".map-overlay");
+  const closeButton = document.querySelectorAll(".close-btn");
                 
-                    bookBtns.forEach((btn, i) => {
-                      btn.addEventListener("click", () => 
-                      formOverlays[i].style.display = "flex");
-                    });
+ bookBtns.forEach((btn, i) => {
+   btn.addEventListener("click", () => 
+      formOverlays[i].style.display = "flex");
+   });
                   
                   
-                    mapBtns.forEach((btn, i) => {
-                      btn.addEventListener("click", () =>
-                       mapOverlays[i].style.display = "flex");
-                    });
+   mapBtns.forEach((btn, i) => {
+    btn.addEventListener("click", () =>
+     mapOverlays[i].style.display = "flex");
+   });
+ closeButton.forEach((btn) => {
+   btn.addEventListener("click", (e) => {
+ e.target.closest(".overlay").style.display = "none";
+   });
+  });
                   
-                    closeButton.forEach((btn) => {
-                      btn.addEventListener("click", (e) => {
-                        e.target.closest(".overlay").style.display = "none";
-                      });
-                    });
-                  
-                    document.querySelectorAll(".overlay").forEach((overlay) => {
-                      overlay.addEventListener("click", (e) => {
-                        if (e.target === overlay) overlay.style.display = "none";
-                      });
-                    });
+  document.querySelectorAll(".overlay").forEach((overlay) => {
+   overlay.addEventListener("click", (e) => {
+ if (e.target === overlay) overlay.style.display = "none";
+  });
+   });
+   
         
+//  intigration
 
+
+   
+
+               document.getElementById('rideBookingForm').addEventListener('submit', async function(e){
+                 e.preventDefault(); // prevent default form submit
+                 const token = localStorage.getItem("token");
+                   if (!token) {
+                   alert("Please login first!");
+                   return;
+                 }
+                
+                 const form = e.target;
+                 const formData = new FormData(form);
+            
+          //       // Convert form data to JSON
+                 let data = {};
+                 formData.forEach((value, key) => data[key] = value);
+            
+                 try {
+                     const response = await fetch(form.action, {
+                         method: "POST",
+                         headers: {
+                             "Content-Type": "application/json",
+                            "Accept": "application/json",
+                             "Authorization": "Bearer " + localStorage.getItem('token') // JWT token
+                         },
+                         body: JSON.stringify(data)
+                     });
+                const result = await response.json();
+            
+                    if(response.ok){
+                        alert(result.message); // Success message as alert
+                         form.reset(); // Clear form
+                     } else {
+                         alert(result.error || 'Error booking ride'); // Error message as alert
+                     }
+            
+                 } catch (error) {
+                     console.error(error);
+                    alert('Something went wrong!');
+                 }
+             });
+              
+             document.getElementById('rideBookingFormTwo').addEventListener('submit', async function(e){
+               e.preventDefault(); // prevent default form submit
+               const token = localStorage.getItem("token");
+               if (!token) {
+                 alert("Please login first!");
+                 return;
+               }
+              
+               const form = e.target;
+               const formData = new FormData(form);
+          
+          //     // Convert form data to JSON
+               let data = {};
+               formData.forEach((value, key) => data[key] = value);
+          
+               try {
+                   const response = await fetch(form.action, {
+                      method: "POST",
+                      headers: {
+                          "Content-Type": "application/json",
+                           "Accept": "application/json",
+                           "Authorization": "Bearer " + localStorage.getItem('token') // JWT token
+                       },
+                       body: JSON.stringify(data)
+                  });
+          
+                 const result = await response.json();
+          
+                   if(response.ok){
+                       alert(result.message); // Success message as alert
+                       form.reset(); // Clear form
+                  } else {
+                       alert(result.error || 'Error booking ride'); // Error message as alert
+                   }
+          
+               } catch (error) {
+                   console.error(error);
+                   alert('Something went wrong!');
+               }
+          });
+            
                     // *******************************************
                     // feedback 
             const feedbackBtn = document.getElementById("feedbackBtn");
@@ -234,7 +327,7 @@ function moveSlide(slideIndex) {
               });
             });
           
-            // Handle form submission
+            // Handle form submission feedback intigration
 const form = document.querySelector(".form-container"); 
 
 form.addEventListener("submit", async (e) => {
@@ -277,17 +370,19 @@ form.addEventListener("submit", async (e) => {
     alert("Something went wrong!");
   }
 });
+
+
           //********************************************************** */
         //  contect        
 
         // Buttons
 const callBtn = document.getElementById("callBtn");
-const whatsappBtn = document.getElementById("whatsappBtn");
-const emailBtn = document.getElementById("emailBtn");
+// const whatsappBtn = document.getElementById("whatsappBtn");
+// const emailBtn = document.getElementById("emailBtn");
 
 const callPopup = document.getElementById("callPopup");
-const whatsappPopup = document.getElementById("whatsappPopup");
-const emailPopup = document.getElementById("emailPopup");
+// const whatsappPopup = document.getElementById("whatsappPopup");
+// const emailPopup = document.getElementById("emailPopup");
 
 
 const closeBtns = document.querySelectorAll(".close");
@@ -297,13 +392,13 @@ callBtn.addEventListener("click", () => {
   callPopup.classList.add("show");
 });
 
-whatsappBtn.addEventListener("click", () => {
-  whatsappPopup.classList.add("show");
-});
+// whatsappBtn.addEventListener("click", () => {
+//   whatsappPopup.classList.add("show");
+// });
 
-emailBtn.addEventListener("click", () => {
-  emailPopup.classList.add("show");
-});
+// emailBtn.addEventListener("click", () => {
+//   emailPopup.classList.add("show");
+// });
 
 closeBtns.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -311,8 +406,28 @@ closeBtns.forEach(btn => {
   });
 });
 
-window.addEventListener("click", (e) => {
-  if (e.target.classList.contains("popup")) {
-    e.target.classList.remove("show");
-  }
-});
+function openWhatsApp() {
+  // Yahan apna WhatsApp number daalo
+  let phone = "923001234567";  
+
+  // Direct WhatsApp open karega (no message, only chat)
+  let url = `https://wa.me/${phone}`;
+
+  window.open(url, "_blank");  // new tab me open karega
+}
+function openEmail() {
+  // Yahan apna email add karo
+  let email = "rimshachoudhary.7614@gmail.com";
+
+  // Direct email compose window open karega
+  let url = `mailto:${email}`;
+
+  window.location.href = url;
+}
+
+// window.addEventListener("click", (e) => {
+//   if (e.target.classList.contains("popup")) {
+//     e.target.classList.remove("show");
+//   }
+// });
+

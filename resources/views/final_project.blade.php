@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
 <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
     <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -20,22 +21,28 @@
     <!-- header -->
     <header class="zigzag-header">
         <div class="logo">TravelShare</div>
-
         <nav>
-
-          <input type="checkbox" id="check">
-          <label for="check" class="threeline">
-            <i class="uil uil-bars"></i>
-          </label>
-
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Plan Tour</a></li>
-            <li><a href="#">reviews</a></li>
-            <li><a href="/about">About Us</a></li>
-          </ul>
-        </nav>
-        <a href="#" class="login-btn" id="form_open">Login</a> 
+            <input type="checkbox" id="check">
+              <label for="check" class="threeline">
+                   <i class="uil uil-bars"></i>
+               </label>
+             <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Plan Tour</a></li>
+                <li><a href="/review">reviews</a></li>
+                <li><a href="/about">About Us</a></li>
+            </ul>
+      </nav>
+      <div>
+        <a href="#" class="login-btn" id="form_open"  style="display:inline-block;">
+          <i class="fa fa-user"></i> Login
+        </a>
+      
+        <button class="logout-btn" onclick="logout()" style="display:none;">
+          <i class="fa-solid fa-power-off"></i> Logout
+        </button>
+      </div>
+      
       </header>
 
 
@@ -65,7 +72,7 @@
          <input type="checkbox" id="v">
          <label for="check">Remember me</label>
                 </span>
-                <a href="#" class="forgot_pw">Forget password?</a>
+  
               </div>
               <button class="button">Login now</button>
               <div class="login_sigup">
@@ -110,6 +117,8 @@
           </div>
         </div>
       </section>  
+              
+
 
 
        <!-- ********************************************************** -->
@@ -156,13 +165,15 @@
 
           <!-- tour list -->
           <!-- Tours Slider Section -->
-<section class="tours-slider">
+{{-- <section class="tours-slider">
   <h2>🌍 Upcoming Tours</h2>
 
   <img src="images/back.png" alt="" class="backbtn"  id="backbtn"    >
   <div class="slider-container">
     <div class="slider-track">
       <!-- Tour Card 1 -->
+      
+        @foreach($packages as $package)
       <div class="tour-card"
       data-title="3 Days Trip to Swat – Kalam – Mahodand Lake"
       data-duration="3 Days & 2 Nights"
@@ -245,7 +256,7 @@
         <p>5 Days & 4 Nights <strong> |</strong> PKR 30,000 / Head</p>
         <button class="btn-tour">View Details</button>
       </div>
-  
+      @endforeach
     </div>
   </div>
   <img src="images/next.png" alt="" class="nextbtn" id="nextbtn">
@@ -255,7 +266,76 @@
     <span class="dot" onclick="moveSlide(1)"></span>
     <span class="dot" onclick="moveSlide(2)"></span>
   </div>
+</section> --}}
+
+<section class="tours-slider">
+  <h2>🌍 Upcoming Tours</h2>
+
+  <img src="images/back.png" alt="Back" class="backbtn" id="backbtn">
+
+  <div class="slider-container">
+    <div class="slider-track" id="packageContainer">
+      <!-- Packages API se yahan load honge -->
+    </div>
+  </div>
+
+  <img src="images/next.png" alt="Next" class="nextbtn" id="nextbtn">
 </section>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+  
+  fetch('/api/getpackages')
+      .then(response => response.json())
+      .then(result => {
+
+          let packages = result.data;
+          let container = document.getElementById('packageContainer');
+          let html = '';
+
+          packages.forEach(pkg => {
+              html += `
+                  <div class="tour-card"
+                      data-title="${pkg.name}"
+                      data-duration="${pkg.duration} Days"
+                      data-price="PKR ${pkg.price}"
+                      data-description="${pkg.description}"
+                      data-image="images${pkg.image}"
+                  >
+                  <img src="/${pkg.image}" alt="Tour Image">
+                  
+                      <h3>${pkg.name}</h3>
+                      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
+                    
+                      <button class="btn-tour">View Details</button>
+                  </div>
+              `;
+          });
+      
+          container.innerHTML = html;
+      })
+      .catch(error => {
+          console.error('Error loading packages:', error);
+      });
+
+});
+
+document.addEventListener("click", function (e) {
+
+    let card = e.target.closest(".tour-card");
+    if (!card) return;
+
+    let title = encodeURIComponent(card.dataset.title);
+    let duration = encodeURIComponent(card.dataset.duration);
+    let price = encodeURIComponent(card.dataset.price);
+    let description = encodeURIComponent(card.dataset.description);
+
+    window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}&description=${description}`;
+});
+
+  </script>
+    
+  
 
                                <!-- ********************** -->
              <!-- feedback -->
@@ -287,9 +367,12 @@
 
 
                 <!-- rides avaible -->
-                <div class="ride-heading"><h1>Avaible Rides</h1></div>
-                  <div class="ride_cantainer">
-                <div class="ride-card">
+
+                <div class="ride-heading">
+                  <h1>Avaible Rides</h1>
+                </div>
+                  <div class="ride_cantainer"  id="ridesContainer">
+                <div class="ride-card"  class="ride_container">
                   <img src="images/download.jpg" alt="Car" class="ride-image">
                   <div class="ride-details">
                     <h2>BWP → hasilpur</h2>
@@ -306,22 +389,24 @@
                 </div>
               
                
-                <div class="overlay form-overlay ">
+                <div class="overlay form-overlay " id="bookingModal">
                   <div class="booking-form">
-                    <span class="close-btn" >&times;</span>
+                    <span class="close-btn" id="closeBooking">&times;</span>
                     <h2>Book Your Ride</h2>
-                    <form>
+                    <form id="rideBookingForm"  >
+                      @csrf
+                      <input type="hidden" name="ride_id" id="ride_id">
                       <label>Full Name</label>
-                      <input type="text" placeholder="Enter your name" required>
+                      <input type="text" name="full_name" placeholder="Enter your name" required>
                       
                       <label>Address</label>
-                      <textarea rows="3" placeholder="Enter your address" required></textarea>
+                      <textarea rows="3" name="address" placeholder="Enter your address" required></textarea>
                       
                       <label>Phone Number</label>
-                      <input type="tel" placeholder="03xx-xxxxxxx" required>
+                      <input type="tel" name="phone" placeholder="03xx-xxxxxxx" required>
               
                       <label>Seats to Book</label>
-                      <select required>
+                      <select  name="seats"  required>
                         <option value="">Select Seats</option>
                         <option value="1">1 Seat</option>
                         <option value="2">2 Seats</option>
@@ -329,6 +414,7 @@
                       
                       <button type="submit">Confirm Booking</button>
                     </form>
+                    
                   </div>
                 </div>
               
@@ -351,7 +437,7 @@
   
                           <!-- 2nd car ride  -->
                   <!-- Ride Card -->
-  <div class="ride-card" >
+  <div class="ride-card" class="ride_container" id="ridesContainer">
     <img src="images/download.jpg" alt="Car" class="ride-image">
     <div class="ride-details">
       <h2>BWP → hasilpur</h2>
@@ -372,18 +458,19 @@
     <div class="booking-form">
       <span class="close-btn" >&times;</span>
       <h2>Book Your Ride</h2>
-      <form>
+      <form id="rideBookingFormTwo"   >
+        @csrf
         <label>Full Name</label>
-        <input type="text" placeholder="Enter your name" required>
+        <input type="text"name="full_name" placeholder="Enter your name" required>
         
         <label>Address</label>
-        <textarea rows="3" placeholder="Enter your address" required></textarea>
+        <textarea rows="3" name="address" placeholder="Enter your address" required></textarea>
         
         <label>Phone Number</label>
-        <input type="tel" placeholder="03xx-xxxxxxx" required>
+        <input type="tel" name="phone" placeholder="03xx-xxxxxxx" required>
 
         <label>Seats to Book</label>
-        <select required>
+        <select  name="seats"  required>
           <option value="">Select Seats</option>
           <option value="1">1 Seat</option>
           <option value="2">2 Seats</option>
@@ -411,6 +498,9 @@
     </div>
   </div>
                          </div>
+
+                       
+
    <!-- ************************************************************************* -->
            <!-- contect  -->
             
@@ -441,8 +531,8 @@
                     <h4>Contact</h4>
                     <ul>
                       <li><a href="#" id="callBtn">📞 Call Us</a></li>
-                      <li><a href="#" id="whatsappBtn">💬 WhatsApp</a></li>
-                      <li><a href="#" id="emailBtn">✉️ Email</a></li>
+                      <li><a href="#" id="whatsappBtn" onclick="openWhatsApp()" >💬 WhatsApp</a></li>
+                      <li><a href="#" id="emailBtn" onclick="openEmail()" >✉️ Email</a></li>
                     </ul>
                   </div>
               
@@ -457,32 +547,8 @@
                 </div>
               </div>
               
-              <!-- Popup: WhatsApp -->
-              <div class="popup" id="whatsappPopup">
-                <div class="popup-content">
-                  <span class="close">&times;</span>
-                  <h3>WhatsApp Us</h3>
-                  <form>
-                    <input type="text" placeholder="Your Name" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="send-btn">Send</button>
-                  </form>
-                </div>
-              </div>
-              
-              <!-- Popup: Email -->
-              <div class="popup" id="emailPopup">
-                <div class="popup-content">
-                  <span class="close">&times;</span>
-                  <h3>Email Us</h3>
-                  <form>
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="send-btn">Send</button>
-                  </form>
-                </div>
-              </div>
+             
+
               
               <!-- Social Media -->
               <div class="footer-col">
@@ -504,5 +570,7 @@
            
 
     <script src="{{asset('js/final_project.js')}}"></script>  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </body>
 </html>

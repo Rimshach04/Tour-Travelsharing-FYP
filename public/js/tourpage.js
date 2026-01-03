@@ -106,7 +106,11 @@ document.getElementById("finalBooking").addEventListener("click", async () => {
     phone_number: userPhone,
     address: userAddress
   };
-
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Please login first!");
+    return;
+  }
   try {
     const token = localStorage.getItem("token");
     const response = await fetch("http://127.0.0.1:8000/api/create-tour", {
