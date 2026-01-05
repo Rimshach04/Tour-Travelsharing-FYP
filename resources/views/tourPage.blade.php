@@ -65,10 +65,10 @@
     </div>
 
     <!-- Trip Type -->
-    <span >Select Trip Type:</span>
+    {{-- <span >Select Trip Type:</span>
     <select id="trip-type">
       <option value="public">Public</option>
-      <option value="private">Private</option>
+      <option value="private">Private</option> --}}
     </select>
 
     <!-- Total Price -->

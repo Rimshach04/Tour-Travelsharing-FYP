@@ -174,126 +174,59 @@ function moveSlide(slideIndex) {
   dots[slideIndex].classList.add("active");
 }
 
-   
-                      //************************************************ */
+         
+document.addEventListener("DOMContentLoaded", function () {
+  
+  fetch('/api/getpackages')
+      .then(response => response.json())
+      .then(result => {
 
-                    //   ride share
-                   
-   const bookBtns = document.querySelectorAll(".book-btn");
-   const formOverlays = document.querySelectorAll(".form-overlay");
-  const mapBtns = document.querySelectorAll(".map-btn");
-  const mapOverlays = document.querySelectorAll(".map-overlay");
-  const closeButton = document.querySelectorAll(".close-btn");
-                
- bookBtns.forEach((btn, i) => {
-   btn.addEventListener("click", () => 
-      formOverlays[i].style.display = "flex");
-   });
+          let packages = result.data;
+          let container = document.getElementById('packageContainer');
+          let html = '';
+
+          packages.forEach(pkg => {
+              html += `
+                  <div class="tour-card"
+                      data-title="${pkg.name}"
+                      data-duration="${pkg.duration} Days"
+                      data-price="PKR ${pkg.price}"
+                      data-description="${pkg.description}"
+                      data-image="images${pkg.image}"
+                  >
+                  <img src="/${pkg.image}" alt="Tour Image">
                   
-                  
-   mapBtns.forEach((btn, i) => {
-    btn.addEventListener("click", () =>
-     mapOverlays[i].style.display = "flex");
-   });
- closeButton.forEach((btn) => {
-   btn.addEventListener("click", (e) => {
- e.target.closest(".overlay").style.display = "none";
-   });
-  });
-                  
-  document.querySelectorAll(".overlay").forEach((overlay) => {
-   overlay.addEventListener("click", (e) => {
- if (e.target === overlay) overlay.style.display = "none";
-  });
-   });
-   
-        
-//  intigration
-
-
-   
-
-               document.getElementById('rideBookingForm').addEventListener('submit', async function(e){
-                 e.preventDefault(); // prevent default form submit
-                 const token = localStorage.getItem("token");
-                   if (!token) {
-                   alert("Please login first!");
-                   return;
-                 }
-                
-                 const form = e.target;
-                 const formData = new FormData(form);
-            
-          //       // Convert form data to JSON
-                 let data = {};
-                 formData.forEach((value, key) => data[key] = value);
-            
-                 try {
-                     const response = await fetch(form.action, {
-                         method: "POST",
-                         headers: {
-                             "Content-Type": "application/json",
-                            "Accept": "application/json",
-                             "Authorization": "Bearer " + localStorage.getItem('token') // JWT token
-                         },
-                         body: JSON.stringify(data)
-                     });
-                const result = await response.json();
-            
-                    if(response.ok){
-                        alert(result.message); // Success message as alert
-                         form.reset(); // Clear form
-                     } else {
-                         alert(result.error || 'Error booking ride'); // Error message as alert
-                     }
-            
-                 } catch (error) {
-                     console.error(error);
-                    alert('Something went wrong!');
-                 }
-             });
-              
-             document.getElementById('rideBookingFormTwo').addEventListener('submit', async function(e){
-               e.preventDefault(); // prevent default form submit
-               const token = localStorage.getItem("token");
-               if (!token) {
-                 alert("Please login first!");
-                 return;
-               }
-              
-               const form = e.target;
-               const formData = new FormData(form);
-          
-          //     // Convert form data to JSON
-               let data = {};
-               formData.forEach((value, key) => data[key] = value);
-          
-               try {
-                   const response = await fetch(form.action, {
-                      method: "POST",
-                      headers: {
-                          "Content-Type": "application/json",
-                           "Accept": "application/json",
-                           "Authorization": "Bearer " + localStorage.getItem('token') // JWT token
-                       },
-                       body: JSON.stringify(data)
-                  });
-          
-                 const result = await response.json();
-          
-                   if(response.ok){
-                       alert(result.message); // Success message as alert
-                       form.reset(); // Clear form
-                  } else {
-                       alert(result.error || 'Error booking ride'); // Error message as alert
-                   }
-          
-               } catch (error) {
-                   console.error(error);
-                   alert('Something went wrong!');
-               }
+                      <h3>${pkg.name}</h3>
+                      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
+                    
+                      <button class="btn-tour">View Details</button>
+                  </div>
+              `;
           });
-            
+      
+          container.innerHTML = html;
+      })
+      .catch(error => {
+          console.error('Error loading packages:', error);
+      });
+
+});
+
+document.addEventListener("click", function (e) {
+
+    let card = e.target.closest(".tour-card");
+    if (!card) return;
+
+    let title = encodeURIComponent(card.dataset.title);
+    let duration = encodeURIComponent(card.dataset.duration);
+    let price = encodeURIComponent(card.dataset.price);
+    let description = encodeURIComponent(card.dataset.description);
+
+    window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}&description=${description}`;
+});
+
+                   
+  
                     // *******************************************
                     // feedback 
             const feedbackBtn = document.getElementById("feedbackBtn");

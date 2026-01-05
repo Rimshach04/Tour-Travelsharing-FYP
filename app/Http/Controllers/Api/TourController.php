@@ -65,21 +65,45 @@ class TourController extends Controller
    
     public function getTours(Request $request)
     {
-        $user =  $request->auth_user->id;
+        $userId = $request->auth_user->id;
 
-        if (!$user) {
+        if (!isset($request->auth_user)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Token not valid.'
             ], 401);
         }
+    
+        $perPage = $request->get('per_page', 5); // default 5 records
+    
+        // $tours = TourBooking::where('user_id', $userId)
+        //             ->orderBy('id', 'desc')
+        //             ->paginate($perPage);
+        $tours = TourBooking::with('user')  // 🔹 Add this
+            ->where('user_id', $userId)
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
 
-        $tours = TourBooking::where('user_id', $user)->get();
+       return response()->json([
+         'success' => true,
+         'data' => $tours
+             ], 200);
+    
+        // $user =  $request->auth_user->id;
 
-        return response()->json([
-            'success' => true,
-            'data' => $tours
-        ]);
+        // if (!$user) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Token not valid.'
+        //     ], 401);
+        // }
+
+        // $tours = TourBooking::where('user_id', $user)->get();
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $tours
+        // ]);
     }
     
     public function deleteTour(Request $request, $id)

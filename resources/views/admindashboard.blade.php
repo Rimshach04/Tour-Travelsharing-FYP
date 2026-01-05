@@ -323,10 +323,11 @@
 
         .table-container {
             overflow-x: auto;
+         
         }
 
         table {
-            width: 100%;
+            width: 90%;
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -472,6 +473,8 @@
             </div>
         </div>
 
+        {{-- ************************************************** --}}
+
         <div class="main-content">
             <div class="sidebar">
                 <div class="nav-item active" onclick="showSection('packages')">
@@ -492,7 +495,7 @@
                 </div>
             </div>
 
-           
+           {{-- *******************************************  --}}
                 
             <div class="content-area">
                 <!-- Tour Packages Section -->
@@ -519,9 +522,7 @@
                                     <label>Package Image</label>
                                     <input type="file"    name="image" id="packageImage" accept="image/*" required>
                                 </div>
-                                <div class="form-group full-width">
-                                    <div id="daysContainer"></div>
-                                </div>
+                              
                                 <div class="form-group">
                                     <label>Location</label>
                                     <input type="text" id="packageLocation" required>
@@ -538,66 +539,137 @@
                     <div id="packagesList" class="grid"></div>
                 </div>
 
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                    
-                        const durationInput = document.getElementById("packageDuration");
-                        const daysContainer = document.getElementById("daysContainer");
-                    
-                        if (!durationInput || !daysContainer) return;
-                    
-                        durationInput.addEventListener("input", function () {
-                            const days = parseInt(this.value);
-                            daysContainer.innerHTML = "";
-                    
-                            if (isNaN(days) || days <= 0) return;
-                    
-                            for (let i = 1; i <= days; i++) {
-                                const dayDiv = document.createElement("div");
-                                dayDiv.classList.add("form-group", "full-width");
-                    
-                                dayDiv.innerHTML = `
-                                    <label>Day ${i} Description</label>
-                                    <textarea name="day_${i}_description" required></textarea>
-                                `;
-                    
-                                daysContainer.appendChild(dayDiv);
-                            }
-                        });
-                    
-                    });
-                    </script>
-               
-                    
+               <script>
+                const packageForm = document.getElementById('packageForm');
+packageForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', document.getElementById('packageName').value);
+    formData.append('price', document.getElementById('packagePrice').value);
+    formData.append('duration', document.getElementById('packageDuration').value);
+    formData.append('location', document.getElementById('packageLocation').value);
+    formData.append('description', document.getElementById('packageDescription').value);
+    formData.append('image', document.getElementById('packageImage').files[0]);
 
+    fetch('http://127.0.0.1:8000/api/packages', {
+        method: 'POST',
+        body: formData   
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status) {
+            showToast('Package added successfully!');
+            packageForm.reset();   
+            loadPackages();
+        }
+    })
+    .catch(err => console.log(err));
+        
+        });
+     
+        function loadPackages() {
+            fetch('http://127.0.0.1:8000/api/getpackages')
+        .then(res => res.json())
+        .then(result => {
+            packages = result.data;     // ✅ IMPORTANT
+            renderPackages();
+            updateStats();
+            updateSelects();
+        })
+        .catch(err => console.log(err));    
+}
+
+function deletePackage(id) {
+    if (!confirm('Are you sure you want to delete this package?')) return;
+
+    fetch(`http://127.0.0.1:8000/api/delpackages/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+    'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            packages = packages.filter(pkg => pkg.id !== id);
+            updateStats();
+            renderPackages();
+            updateSelects();
+            showToast('Package deleted successfully!');
+        } else {
+            showToast('Failed to delete package.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('deleting package.');
+    });
+}
+
+window.onload = loadPackages;
+        function renderPackages() {
+            const container = document.getElementById('packagesList');
+            if (packages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>No packages added yet</p>
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = packages.map(pkg => `
+                <div class="card">          
+          <img 
+          src="/${pkg.image}" alt="${pkg.name}"
+            style="
+                width:100%;
+                height:180px;
+                object-fit:cover;
+                border-radius:12px 12px 0 0;
+                margin-bottom:10px;
+            "
+      >
+                    <div class="card-header">
+                        <span class="card-title">${pkg.name}</span>
+                        <span class="badge badge-success">PKR ${pkg.price.toLocaleString()}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value">${pkg.location}</span>
+                    </div>
+                     <div class="info-row">
+                         <span class="info-label">Duration:</span>
+                       <span class="info-value">${pkg.duration} Days</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Description:</span>
+                    </div>
+                    
+                    <p style="margin-top: 10px; color: #666;">${pkg.description}</p>
+                    <div class="actions" style="margin-top: 15px;">
+                        <button class="btn btn-danger" onclick="deletePackage(${pkg.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // function deletePackage(id) {
+        //     if (confirm('Are you sure you want to delete this package?')) {
+        //         packages = packages.filter(pkg => pkg.id !== id);
+        //         updateStats();
+        //         renderPackages();
+        //         updateSelects();
+        //         showToast('Package deleted successfully!');
+        //     }
+        // }
+
+                 </script>
+                    
                 <!-- Users Section -->
                 <div id="users" class="section">
                     <h2 class="section-title">All Users</h2>
-                    
-                    <div class="card">
-                        <h3 style="margin-bottom: 20px; color: var(--secondary); font-family: 'Space Mono', monospace;">Add New User</h3>
-                        <form id="userForm">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>Full Name</label>
-                                    <input type="text" id="userName" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" id="userEmail" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone</label>
-                                    <input type="tel" id="userPhone" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>City</label>
-                                    <input type="text" id="userCity" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add User</button>
-                        </form>
-                    </div>
 
                     <div class="table-container">
                         <table>
@@ -606,48 +678,166 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>City</th>
-                                    <th>Joined</th>
-                                    <th>Actions</th>
+                                    <th>password</th>
+                                    <th>role</th>
+                                    {{-- <th>Actions</th> --}}
                                 </tr>
                             </thead>
                             <tbody id="usersTable"></tbody>
                         </table>
+                        <div id="pagination" style="margin-top: 10px;"></div>
                     </div>
                 </div>
-
+                      
+<script>
+    let currentPage = 1;
+    const perPage = 5; // Number of users per page
+    
+    function fetchUsers(page = 1) {
+        currentPage = page;
+        fetch(`/api/users?per_page=${perPage}&page=${page}`)
+            .then(res => res.json())
+            .then(result => {
+                users = result.data.data;   // ✅ Yahan lagao
+                 updateStats();
+                const tbody = document.getElementById("usersTable");
+                tbody.innerHTML = '';
+    
+                // Loop through users
+                result.data.data.forEach(user => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                            <td>•••••••</td>
+                            <td>${user.role}</td>
+                        </tr>
+                    `;
+                });
+    
+                // Pagination buttons
+                const paginationDiv = document.getElementById("pagination");
+                paginationDiv.innerHTML = '';
+    
+                for (let i = 1; i <= result.data.last_page; i++) {
+                    const btn = document.createElement("button");
+                    btn.innerText = i;
+                    btn.disabled = i === result.data.current_page;
+                    btn.style.marginRight = "5px";
+                    btn.onclick = () => fetchUsers(i);
+                    paginationDiv.appendChild(btn);
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching users:", err);
+            });
+    }
+    
+    // Initial load
+    fetchUsers(currentPage);
+    // *********************************************
+    </script>
                 <!-- Bookings Section -->
                 <div id="bookings" class="section">
                     <h2 class="section-title">All Bookings</h2>
+                    {{-- <div id="bookingsList"></div> --}}
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tour Title</th>
+                                    <th>Date</th>
+                                    <th>Adults</th>
+                                    <th>Children</th>
+                                    <th>Infant</th>
+                                    <th>Total Price</th>
+                                    <th>name</th>
+                                    <th>phone_number</th>
+                                    <th>address</th>
+                                    <th>user name</th>
+                                    <th>Booked</th>
+                                </tr>
+                            </thead>
+                            <tbody id="toursTable"></tbody>
+                        </table>
                     
-                    <div class="card">
-                        <h3 style="margin-bottom: 20px; color: var(--secondary); font-family: 'Space Mono', monospace;">Create New Booking</h3>
-                        <form id="bookingForm">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>Select User</label>
-                                    <select id="bookingUser" required></select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Select Package</label>
-                                    <select id="bookingPackage" required></select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Booking Date</label>
-                                    <input type="date" id="bookingDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Number of People</label>
-                                    <input type="number" id="bookingPeople" min="1" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-secondary">Create Booking</button>
-                        </form>
+                        <div id="tourPagination" style="margin-top: 10px;"></div>
                     </div>
-
-                    <div id="bookingsList"></div>
+                    
                 </div>
+                <script>
+                    let tourPage = 1;
+                    const tourPerPage = 5;
+                    
+                    function fetchTours(page = 1) {
+                        const token = localStorage.getItem('token');
+                        fetch(`/api/get-tours?per_page=${tourPerPage}&page=${page}`, {
+                        
+                                headers: {
+            'Authorization': 'Bearer ' + token, // ✅ use the real token
+            'Accept': 'application/json'
+        }
+                           
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            console.log(result); // DEBUG (zaroor dekho)
+                    
+                if (!result.success || !result.data || !result.data.data) {
+                    console.error("Invalid response");
+                    return;
+                }
+                bookings = result.data.data;  
+                 updateStats();
+                            const tbody = document.getElementById("toursTable");
+                            if (!tbody) {
+                    console.error("toursTable not found");
+                    return;
+                }
+                            tbody.innerHTML = '';
+                    
+                            result.data.data.forEach(tour => {
+                                tbody.innerHTML += `
+                                    <tr>
+                                        <td>${tour.tour_title}</td>
+                                        <td>${tour.date}</td>
+                                        <td>${tour.adult}</td>
+                                        <td>${tour.children}</td>
+                                        <td>${tour.infant}</td>
+                                        <td>${tour.total_price}</td>
+                                        <td>${tour.name}</td>
+                                        <td>${tour.phone_number}</td>
+                                        <td>${tour.address}</td>
+                                        
+                                        <td>${tour.user ? tour.user.name : ''}</td>
 
+                                        <td>${tour.booked ? 'Yes' : 'No'}</td>
+                                    </tr>
+                                `;
+                            });
+                    
+                            // Pagination
+                            const paginationDiv = document.getElementById("tourPagination");
+                            paginationDiv.innerHTML = '';
+                    
+                            for (let i = 1; i <= result.data.last_page; i++) {
+                                const btn = document.createElement("button");
+                                btn.innerText = i;
+                                btn.disabled = i === result.data.current_page;
+                                btn.onclick = () => fetchTours(i);
+                                paginationDiv.appendChild(btn);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching tours:", error);
+                        });
+                    }
+                    
+                    // Page load
+                    fetchTours(tourPage);
+                    </script>
+                    {{-- ************************************************************ --}}
                 <!-- Reviews Section -->
                 <div id="reviews" class="section">
                     <h2 class="section-title">Package Reviews</h2>
@@ -700,59 +890,8 @@
 
         // Initialize with sample data
         function initializeSampleData() {
-            // Sample packages
-            packages = [
-                {
-                    id: 1,
-                    name: "Hunza Valley Adventure",
-                    price: 45000,
-                    duration: 7,
-                    location: "Hunza, Gilgit-Baltistan",
-                    description: "Explore the breathtaking Hunza Valley with its majestic mountains and rich culture."
-                },
-                {
-                    id: 2,
-                    name: "Skardu Explorer",
-                    price: 55000,
-                    duration: 5,
-                    location: "Skardu",
-                    description: "Experience the beauty of Skardu with visits to Shangrila Resort and Deosai Plains."
-                }
-            ];
+           
 
-            // Sample users
-            users = [
-                {
-                    id: 1,
-                    name: "Ahmed Khan",
-                    email: "ahmed@email.com",
-                    phone: "0300-1234567",
-                    city: "Lahore",
-                    joined: "2024-01-15"
-                },
-                {
-                    id: 2,
-                    name: "Fatima Ali",
-                    email: "fatima@email.com",
-                    phone: "0321-9876543",
-                    city: "Karachi",
-                    joined: "2024-02-20"
-                }
-            ];
-
-            // Sample bookings
-            bookings = [
-                {
-                    id: 1,
-                    userId: 1,
-                    packageId: 1,
-                    date: "2024-06-15",
-                    people: 2,
-                    status: "confirmed"
-                }
-            ];
-
-            // Sample reviews
             reviews = [
                 {
                     id: 1,
@@ -800,112 +939,112 @@
 
        
 
-        const packageForm = document.getElementById('packageForm');
+//         const packageForm = document.getElementById('packageForm');
 
-packageForm.addEventListener('submit', function(e) {
-    e.preventDefault();
+// packageForm.addEventListener('submit', function(e) {
+//     e.preventDefault();
 
-    const formData = new FormData();
+//     const formData = new FormData();
 
-    formData.append('name', document.getElementById('packageName').value);
-    formData.append('price', document.getElementById('packagePrice').value);
-    formData.append('duration', document.getElementById('packageDuration').value);
-    formData.append('location', document.getElementById('packageLocation').value);
-    formData.append('description', document.getElementById('packageDescription').value);
-    formData.append('image', document.getElementById('packageImage').files[0]);
+//     formData.append('name', document.getElementById('packageName').value);
+//     formData.append('price', document.getElementById('packagePrice').value);
+//     formData.append('duration', document.getElementById('packageDuration').value);
+//     formData.append('location', document.getElementById('packageLocation').value);
+//     formData.append('description', document.getElementById('packageDescription').value);
+//     formData.append('image', document.getElementById('packageImage').files[0]);
 
    
-    fetch('http://127.0.0.1:8000/api/packages', {
-        method: 'POST',
-        body: formData   
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status) {
-            showToast('Package added successfully!');
-            packageForm.reset();   
-            loadPackages();
-        }
-    })
-    .catch(err => console.log(err));
+//     fetch('http://127.0.0.1:8000/api/packages', {
+//         method: 'POST',
+//         body: formData   
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         if (data.status) {
+//             showToast('Package added successfully!');
+//             packageForm.reset();   
+//             loadPackages();
+//         }
+//     })
+//     .catch(err => console.log(err));
         
-        });
+//         });
      
-        function loadPackages() {
-            fetch('http://127.0.0.1:8000/api/getpackages')
-        .then(res => res.json())
-        .then(result => {
-            packages = result.data;     // ✅ IMPORTANT
-            renderPackages();
-            updateStats();
-            updateSelects();
-        })
-        .catch(err => console.log(err));
+//         function loadPackages() {
+//             fetch('http://127.0.0.1:8000/api/getpackages')
+//         .then(res => res.json())
+//         .then(result => {
+//             packages = result.data;     // ✅ IMPORTANT
+//             renderPackages();
+//             updateStats();
+//             updateSelects();
+//         })
+//         .catch(err => console.log(err));
      
-}
+// }
 
-window.onload = loadPackages;
+// window.onload = loadPackages;
 
-        function renderPackages() {
-            const container = document.getElementById('packagesList');
-            if (packages.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <p>No packages added yet</p>
-                    </div>
-                `;
-                return;
-            }
+//         function renderPackages() {
+//             const container = document.getElementById('packagesList');
+//             if (packages.length === 0) {
+//                 container.innerHTML = `
+//                     <div class="empty-state">
+//                         <div class="empty-state-icon">📦</div>
+//                         <p>No packages added yet</p>
+//                     </div>
+//                 `;
+//                 return;
+//             }
 
-            container.innerHTML = packages.map(pkg => `
-                <div class="card">
+//             container.innerHTML = packages.map(pkg => `
+//                 <div class="card">
                     
-          <img 
-          src="/${pkg.image}" alt="${pkg.name}"
-            style="
-                width:100%;
-                height:180px;
-                object-fit:cover;
-                border-radius:12px 12px 0 0;
-                margin-bottom:10px;
-            "
-      >
-                    <div class="card-header">
-                        <span class="card-title">${pkg.name}</span>
-                        <span class="badge badge-success">PKR ${pkg.price.toLocaleString()}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Location:</span>
-                        <span class="info-value">${pkg.location}</span>
-                    </div>
-                     <div class="info-row">
-                         <span class="info-label">Duration:</span>
-                       <span class="info-value">${pkg.duration} Days</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Description:</span>
-                    </div>
+//           <img 
+//           src="/${pkg.image}" alt="${pkg.name}"
+//             style="
+//                 width:100%;
+//                 height:180px;
+//                 object-fit:cover;
+//                 border-radius:12px 12px 0 0;
+//                 margin-bottom:10px;
+//             "
+//       >
+//                     <div class="card-header">
+//                         <span class="card-title">${pkg.name}</span>
+//                         <span class="badge badge-success">PKR ${pkg.price.toLocaleString()}</span>
+//                     </div>
+//                     <div class="info-row">
+//                         <span class="info-label">Location:</span>
+//                         <span class="info-value">${pkg.location}</span>
+//                     </div>
+//                      <div class="info-row">
+//                          <span class="info-label">Duration:</span>
+//                        <span class="info-value">${pkg.duration} Days</span>
+//                     </div>
+//                     <div class="info-row">
+//                         <span class="info-label">Description:</span>
+//                     </div>
                     
-                    <p style="margin-top: 10px; color: #666;">${pkg.description}</p>
-                    <div class="actions" style="margin-top: 15px;">
-                        <button class="btn btn-danger" onclick="deletePackage(${pkg.id})">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+//                     <p style="margin-top: 10px; color: #666;">${pkg.description}</p>
+//                     <div class="actions" style="margin-top: 15px;">
+//                         <button class="btn btn-danger" onclick="deletePackage(${pkg.id})">Delete</button>
+//                     </div>
+//                 </div>
+//             `).join('');
+//         }
 
-        function deletePackage(id) {
-            if (confirm('Are you sure you want to delete this package?')) {
-                packages = packages.filter(pkg => pkg.id !== id);
-                updateStats();
-                renderPackages();
-                updateSelects();
-                showToast('Package deleted successfully!');
-            }
-        }
+//         function deletePackage(id) {
+//             if (confirm('Are you sure you want to delete this package?')) {
+//                 packages = packages.filter(pkg => pkg.id !== id);
+//                 updateStats();
+//                 renderPackages();
+//                 updateSelects();
+//                 showToast('Package deleted successfully!');
+//             }
+//         }
 
-        // User Functions
+//         // User Functions
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -1127,13 +1266,13 @@ window.onload = loadPackages;
         function renderAll() {
             renderPackages();
             renderUsers();
-            renderBookings();
+            // renderBookings();
             renderReviews();
             updateSelects();
         }
 
         // Initialize
-        initializeSampleData();
+        // initializeSampleData();
     </script>
 </body>
 </html>

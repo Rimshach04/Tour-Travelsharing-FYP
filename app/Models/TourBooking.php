@@ -15,4 +15,8 @@ class TourBooking extends Model
         'tour_title', 'per_head_price', 'date', 'adult', 'children', 'infant',
         'total_price', 'name', 'phone_number', 'address', 'booked', 'user_id'
     ];
+    public function user()
+    {
+        return $this->belongsTo(Userregester::class, 'user_id');
+    }
 }

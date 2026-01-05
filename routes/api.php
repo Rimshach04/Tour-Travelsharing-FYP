@@ -15,6 +15,8 @@ use App\Http\Middleware\MyJWTMiddleware;
 Route::post('/signup', [AuthController::class, 'signup'])->name('signup');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/user/{email}', [AuthController::class, 'getUser']);
+Route::get('users', [AuthController::class, 'getUsers']);
+
 Route::delete('/user/{email}', [AuthController::class, 'deleteUser']);
 
 
@@ -40,5 +42,6 @@ Route::post('/feedback', [FeedbackController::class, 'storefeedback'])->middlewa
 
 Route::post('/packages', [PackageController::class, 'store']);
  Route::get('/getpackages', [PackageController::class, 'index']);
+Route::delete('/delpackages/{id}', [PackageController::class, 'destroy']);
 
  Route::post('/rides', [RideinformationController::class, 'rideinfo']);

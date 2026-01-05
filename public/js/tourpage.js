@@ -16,12 +16,12 @@ function updatePrice() {
   let totalPersons = adults + children;
   let total = basePrice * totalPersons;
 
-  const tripType = document.getElementById("trip-type").value;
-  if (tripType === "private" && totalPersons < 7) {
-    document.getElementById("total-price").innerText = "Need min 7 persons for private";
-  } else {
-    document.getElementById("total-price").innerText = "Rs " + total.toLocaleString();
-  }
+  // const tripType = document.getElementById("trip-type").value;
+  // if (tripType === "private" && totalPersons < 7) {
+  //   document.getElementById("total-price").innerText = "Need min 7 persons for private";
+  // } else {
+   document.getElementById("total-price").innerText = "Rs " + total.toLocaleString();
+  // }
 }
 
 // Counter buttons
@@ -49,7 +49,7 @@ document.querySelectorAll(".minus").forEach(btn => {
   });
 });
 
-document.getElementById("trip-type").addEventListener("change", updatePrice);
+// document.getElementById("trip-type").addEventListener("change", updatePrice);
 
 // Modal user form
 const formOverlay = document.getElementById("formOverlay");
@@ -62,7 +62,7 @@ bookNowBtn.addEventListener("click", () => {
   document.getElementById("confirm-adults").innerText = adults;
   document.getElementById("confirm-children").innerText = children;
   document.getElementById("confirm-infants").innerText = infants;
-  document.getElementById("confirm-type").innerText = document.getElementById("trip-type").value;
+  // document.getElementById("confirm-type").innerText = document.getElementById("trip-type").value;
   document.getElementById("confirm-price").innerText = document.getElementById("total-price").innerText;
 
   formOverlay.style.display = "flex";

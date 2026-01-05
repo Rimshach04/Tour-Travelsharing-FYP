@@ -44,5 +44,31 @@ class PackageController extends Controller
         'data' => $packages
     ]);
     }
+
+    public function destroy($id)
+{
+    // Find package by ID
+    $package = Package::find($id);
+
+    if (!$package) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Package not found.'
+        ], 404);
+    }
+
+    // Optional: agar package image file bhi delete karna ho
+    if ($package->image && file_exists(public_path($package->image))) {
+        unlink(public_path($package->image));
+    }
+
+    $package->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Package deleted successfully.'
+    ]);
+}
+
     
 }

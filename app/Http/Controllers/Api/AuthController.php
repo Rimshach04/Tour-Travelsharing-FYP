@@ -92,6 +92,19 @@ public function getUser($email)
     ], 200);
 }
 
+public function getUsers(Request $request)
+{
+    $perPage = $request->get('per_page', 10); // Default 10 users per page
+    $users = Userregester::paginate($perPage);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Users fetched successfully',
+        'data' => $users
+    ], 200);
+}
+
+
 
 public function deleteUser($email)
 {

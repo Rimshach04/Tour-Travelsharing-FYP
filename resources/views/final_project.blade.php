@@ -67,6 +67,11 @@
                 <i class="uil uil-lock password"></i>
                 <i class="uil uil-eye-slash pw_hide"></i>
               </div>
+              <label for="role" class="role">Select Your Role:</label>
+              <select id="role" name="role" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
               <div class="option_field">
                 <span class="checkbox">
          <input type="checkbox" id="v">
@@ -105,7 +110,6 @@
               <label for="role" class="role">Select Your Role:</label>
               <select id="role" name="role" required>
                 <option value="user">User</option>
-                <option value="driver">Driver</option>
                 <option value="admin">Admin</option>
               </select>
               <button class="button">Signup now</button>
@@ -163,110 +167,6 @@
 
           <!-- ****************************************************** -->
 
-          <!-- tour list -->
-          <!-- Tours Slider Section -->
-{{-- <section class="tours-slider">
-  <h2>🌍 Upcoming Tours</h2>
-
-  <img src="images/back.png" alt="" class="backbtn"  id="backbtn"    >
-  <div class="slider-container">
-    <div class="slider-track">
-      <!-- Tour Card 1 -->
-      
-        @foreach($packages as $package)
-      <div class="tour-card"
-      data-title="3 Days Trip to Swat – Kalam – Mahodand Lake"
-      data-duration="3 Days & 2 Nights"
-      data-price="Rs 36,000"
-      >
-        <img src="images/image.jpg" alt="Hunza Tour">
-        <h3> 3 Days Trip to Swat – Kalam   – Mahodand Lake</h3>
-        <p>🕒 3 Days & 2 Nights <strong> |</strong> PKR 36,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-
-      <!-- Tour Card 2 -->
-      <div class="tour-card" 
-      data-title="3 Days Tour to Naran–Shogran–Siri Paye–Babusar"
-      data-duration="3 Days & 2 Nights"
-      data-price="Rs 26,000"
-      >
-        <img src="images/water.avif" alt="Skardu Tour">
-        <h3>3 Days Tour to Naran–Shogran–Siri Paye–Babusar</h3>
-        <p>3 Days & 2 Nights <strong> |</strong> PKR 26,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-
-      <!-- Tour Card 3 -->
-      <div class="tour-card"
-      data-title="3 Days Trip to Murree  – Patriata – Gilgit"
-      data-duration="3 Days & 2 Nights"
-      data-price="Rs 20,000"
-      >
-        <img src="images/8-days-hunza-swat-tour-package-2.webp" alt="Fairy Meadows">
-        <h3>3 Days Trip to Murree  – Patriata – Gilgit</h3>
-        <p>3 Days & 2 Nights<strong> |</strong> PKR 20,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-
-      <!-- Tour Card 4 -->
-      <div class="tour-card"
-      data-title="5 Days Trip to Hunza – Attabad Lake – Khunjerab Pass"
-      data-duration="5 Days & 4 Nights"
-      data-price="Rs 30,000"
-      >
-        <img src="images/road.jpg" alt="Swat Tour">
-        <h3>5 Days Trip to Hunza – Attabad Lake – Khunjerab Pass</h3>
-        <p>5 Days & 4 Nights <strong> |</strong> PKR 30,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-          
-         <!-- Tour Card 5 -->
-      <div class="tour-card"
-      data-title=" 5 Days Tour to Ratti Gali Lake – Taobat – Arang Kel"
-      data-duration="5 Days & 4 Nights"
-      data-price="Rs 30,000"
-      >
-        <img src="images/water.avif" alt="Swat Tour">
-        <h3>5 Days Tour to Ratti Gali Lake – Taobat – Arang Kel</h3>
-        <p>5 Days & 4 Nights <strong> |</strong> PKR 30,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-            
-          <!-- Tour Card 6 -->
-          <div class="tour-card"
-          data-title="5 Days Trip To Fairy Meadows–Nanga Parbat BaseCamp"
-                      data-duration="5 Days & 4 Nights"
-                      data-price="Rs 30,000"
-          >
-            <img src="images/road.jpg" alt="Swat Tour">
-            <h3>5 Days Trip To Fairy Meadows–Nanga Parbat BaseCamp</h3>
-            <p>5 Days & 4 Nights <strong> |</strong> PKR 30,000 / Head</p>
-            <button class="btn-tour">View Details</button>
-          </div>
-
-              <!-- Tour Card 7 -->
-      <div class="tour-card"
-      data-title="5 Days Trip to Hunza – Attabad Lake – Khunjerab Pass"
-      data-duration="5 Days & 4 Nights"
-      data-price="Rs 30,000"
-      >
-        <img src="images/image2.jpg" alt="Swat Tour">
-        <h3>5 Days Trip to Hunza – Attabad Lake – Khunjerab Pass</h3>
-        <p>5 Days & 4 Nights <strong> |</strong> PKR 30,000 / Head</p>
-        <button class="btn-tour">View Details</button>
-      </div>
-      @endforeach
-    </div>
-  </div>
-  <img src="images/next.png" alt="" class="nextbtn" id="nextbtn">
-  <!-- Slider Dots -->
-  <div class="slider-dots">
-    <span class="dot active" onclick="moveSlide(0)"></span>
-    <span class="dot" onclick="moveSlide(1)"></span>
-    <span class="dot" onclick="moveSlide(2)"></span>
-  </div>
-</section> --}}
 
 <section class="tours-slider">
   <h2>🌍 Upcoming Tours</h2>
@@ -281,60 +181,6 @@
 
   <img src="images/next.png" alt="Next" class="nextbtn" id="nextbtn">
 </section>
-
-<script>
-   document.addEventListener("DOMContentLoaded", function () {
-  
-  fetch('/api/getpackages')
-      .then(response => response.json())
-      .then(result => {
-
-          let packages = result.data;
-          let container = document.getElementById('packageContainer');
-          let html = '';
-
-          packages.forEach(pkg => {
-              html += `
-                  <div class="tour-card"
-                      data-title="${pkg.name}"
-                      data-duration="${pkg.duration} Days"
-                      data-price="PKR ${pkg.price}"
-                      data-description="${pkg.description}"
-                      data-image="images${pkg.image}"
-                  >
-                  <img src="/${pkg.image}" alt="Tour Image">
-                  
-                      <h3>${pkg.name}</h3>
-                      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
-                    
-                      <button class="btn-tour">View Details</button>
-                  </div>
-              `;
-          });
-      
-          container.innerHTML = html;
-      })
-      .catch(error => {
-          console.error('Error loading packages:', error);
-      });
-
-});
-
-document.addEventListener("click", function (e) {
-
-    let card = e.target.closest(".tour-card");
-    if (!card) return;
-
-    let title = encodeURIComponent(card.dataset.title);
-    let duration = encodeURIComponent(card.dataset.duration);
-    let price = encodeURIComponent(card.dataset.price);
-    let description = encodeURIComponent(card.dataset.description);
-
-    window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}&description=${description}`;
-});
-
-  </script>
-    
   
 
                                <!-- ********************** -->
@@ -361,143 +207,7 @@ document.addEventListener("click", function (e) {
 
     <button type="submit" class="btn">Submit</button>
     <button type="button" id="closeBtn" class="btn cancel">Close</button>
-  </form>
-</div>
-                           <!-- **************************************************** -->
-
-
-                <!-- rides avaible -->
-
-                <div class="ride-heading">
-                  <h1>Avaible Rides</h1>
-                </div>
-                  <div class="ride_cantainer"  id="ridesContainer">
-                <div class="ride-card"  class="ride_container">
-                  <img src="images/download.jpg" alt="Car" class="ride-image">
-                  <div class="ride-details">
-                    <h2>BWP → hasilpur</h2>
-                    <p><strong>Car:</strong> Toyota Corolla (ABC-789)</p>
-                    <p><strong>Driver:</strong> Ahmed Raza</p>
-                    <p><strong>Phone:</strong> 0301-9876543</p>
-                    <p><strong>Payment:</strong> Rs. 1500 / seat</p>
-                    <p><strong>Departure:</strong> 08:30 AM, 15 Sept</p>
-                    <div class="seats-info">✅ 2 Seats Booked | &#129681; 2 Seats Left</div>
-                    <button class=" book-btn">&#128663; Book Your Seat</button>
-                  </div>
-               
-                  <div class="view-map-btn  map-btn" >Map</div>
-                </div>
-              
-               
-                <div class="overlay form-overlay " id="bookingModal">
-                  <div class="booking-form">
-                    <span class="close-btn" id="closeBooking">&times;</span>
-                    <h2>Book Your Ride</h2>
-                    <form id="rideBookingForm"  >
-                      @csrf
-                      <input type="hidden" name="ride_id" id="ride_id">
-                      <label>Full Name</label>
-                      <input type="text" name="full_name" placeholder="Enter your name" required>
-                      
-                      <label>Address</label>
-                      <textarea rows="3" name="address" placeholder="Enter your address" required></textarea>
-                      
-                      <label>Phone Number</label>
-                      <input type="tel" name="phone" placeholder="03xx-xxxxxxx" required>
-              
-                      <label>Seats to Book</label>
-                      <select  name="seats"  required>
-                        <option value="">Select Seats</option>
-                        <option value="1">1 Seat</option>
-                        <option value="2">2 Seats</option>
-                      </select>
-                      
-                      <button type="submit">Confirm Booking</button>
-                    </form>
-                    
-                  </div>
-                </div>
-              
-                <!-- Map Overlay -->
-                <div class="overlay map-overlay" >
-                  <div class="map-popup">
-                    <span class="close-btn" >&times;</span>
-                    <h2>Route: Hasilpur → Bahawalpur</h2>
-             
-                    <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d13634.299844871889!2d72.5411026!3d29.6939349!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e0!4m5!1sHasilpur%2C%20Bahawalpur%2C%20Punjab!2s!3m2!1d29.6922!2d72.5453!4m5!1sBahawalpur%2C%20Punjab!2s!3m2!1d29.3956!2d71.6833!5e0!3m2!1sen!2s!4v1694505555555"
-                      width="600"
-                      height="400"
-                      style="border:0; border-radius:12px;"
-                      allowfullscreen=""
-                      loading="lazy">
-                    </iframe>
-                  </div>
-                </div>
-  
-                          <!-- 2nd car ride  -->
-                  <!-- Ride Card -->
-  <div class="ride-card" class="ride_container" id="ridesContainer">
-    <img src="images/download.jpg" alt="Car" class="ride-image">
-    <div class="ride-details">
-      <h2>BWP → hasilpur</h2>
-      <p><strong>Car:</strong> Toyota Corolla (ABC-789)</p>
-      <p><strong>Driver:</strong> Ahmed Raza</p>
-      <p><strong>Phone:</strong> 0301-9876543</p>
-      <p><strong>Payment:</strong> Rs. 1500 / seat</p>
-      <p><strong>Departure:</strong> 08:30 AM, 15 Sept</p>
-      <div class="seats-info">✅ 2 Seats Booked | 🪑 2 Seats Left</div>
-      <button class=" book-btn" >🚗 Book Your Seat</button>
-    </div>
-   
-    <div class="view-map-btn  map-btn" >Map</div>
-  </div>
-
-  <!-- Booking Form Overlay -->
-  <div class="overlay form-overlay" >
-    <div class="booking-form">
-      <span class="close-btn" >&times;</span>
-      <h2>Book Your Ride</h2>
-      <form id="rideBookingFormTwo"   >
-        @csrf
-        <label>Full Name</label>
-        <input type="text"name="full_name" placeholder="Enter your name" required>
-        
-        <label>Address</label>
-        <textarea rows="3" name="address" placeholder="Enter your address" required></textarea>
-        
-        <label>Phone Number</label>
-        <input type="tel" name="phone" placeholder="03xx-xxxxxxx" required>
-
-        <label>Seats to Book</label>
-        <select  name="seats"  required>
-          <option value="">Select Seats</option>
-          <option value="1">1 Seat</option>
-          <option value="2">2 Seats</option>
-        </select>
-        
-        <button type="submit">Confirm Booking</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Map Overlay -->
-  <div class="overlay map-overlay">
-    <div class="map-popup">
-      <span class="close-btn" >&times;</span>
-      <h2>Route: Hasilpur → Bahawalpur</h2>
-    
-      <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d13634.299844871889!2d72.5411026!3d29.6939349!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e0!4m5!1sHasilpur%2C%20Bahawalpur%2C%20Punjab!2s!3m2!1d29.6922!2d72.5453!4m5!1sBahawalpur%2C%20Punjab!2s!3m2!1d29.3956!2d71.6833!5e0!3m2!1sen!2s!4v1694505555555"
-        width="600"
-        height="400"
-        style="border:0; border-radius:12px;"
-        allowfullscreen=""
-        loading="lazy">
-      </iframe>
-    </div>
-  </div>
-                         </div>
+  </form></div>
 
                        
 
@@ -570,7 +280,7 @@ document.addEventListener("click", function (e) {
            
 
     <script src="{{asset('js/final_project.js')}}"></script>  
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
 </body>
 </html>
