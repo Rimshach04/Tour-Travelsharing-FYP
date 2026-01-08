@@ -551,6 +551,7 @@ packageForm.addEventListener('submit', function(e) {
     formData.append('description', document.getElementById('packageDescription').value);
     formData.append('image', document.getElementById('packageImage').files[0]);
 
+
     fetch('http://127.0.0.1:8000/api/packages', {
         method: 'POST',
         body: formData   
@@ -629,6 +630,7 @@ window.onload = loadPackages;
                 object-fit:cover;
                 border-radius:12px 12px 0 0;
                 margin-bottom:10px;
+                
             "
       >
                     <div class="card-header">
@@ -647,7 +649,10 @@ window.onload = loadPackages;
                         <span class="info-label">Description:</span>
                     </div>
                     
-                    <p style="margin-top: 10px; color: #666;">${pkg.description}</p>
+                    <p style="margin-top: 10px; color: #666; overflow-y: auto;   /* vertical scroll agar text barh jaye */
+    resize: vertical;   /* user height adjust kar sakta hai, optional */
+    white-space: pre-wrap; /* text wrap ho jaye */
+    word-wrap: break-word;">${pkg.description}</p>
                     <div class="actions" style="margin-top: 15px;">
                         <button class="btn btn-danger" onclick="deletePackage(${pkg.id})">Delete</button>
                     </div>
@@ -655,15 +660,7 @@ window.onload = loadPackages;
             `).join('');
         }
 
-        // function deletePackage(id) {
-        //     if (confirm('Are you sure you want to delete this package?')) {
-        //         packages = packages.filter(pkg => pkg.id !== id);
-        //         updateStats();
-        //         renderPackages();
-        //         updateSelects();
-        //         showToast('Package deleted successfully!');
-        //     }
-        // }
+        
 
                  </script>
                     
@@ -678,8 +675,10 @@ window.onload = loadPackages;
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>password</th>
+                                    {{-- <th>password</th> --}}
                                     <th>role</th>
+                                    <th>Remove data</th>
+
                                     {{-- <th>Actions</th> --}}
                                 </tr>
                             </thead>
@@ -692,7 +691,35 @@ window.onload = loadPackages;
 <script>
     let currentPage = 1;
     const perPage = 5; // Number of users per page
-    
+     
+    function deleteUser(id) {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+
+    const token = localStorage.getItem('token'); // agar auth use kar rahe ho
+
+    fetch(`/api/user/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.success) {
+            alert('User deleted successfully!');
+            fetchUsers(currentPage); // Refresh table
+        } else {
+            alert('Delete failed: ' + response.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error deleting user.');
+    });
+}
+
+
     function fetchUsers(page = 1) {
         currentPage = page;
         fetch(`/api/users?per_page=${perPage}&page=${page}`)
@@ -702,7 +729,7 @@ window.onload = loadPackages;
                  updateStats();
                 const tbody = document.getElementById("usersTable");
                 tbody.innerHTML = '';
-    
+              
                 // Loop through users
                 result.data.data.forEach(user => {
                     tbody.innerHTML += `
@@ -710,8 +737,10 @@ window.onload = loadPackages;
                             <td>${user.name}</td>
                             <td>${user.email}</td>
                             <td>${user.phone}</td>
-                            <td>•••••••</td>
                             <td>${user.role}</td>
+                            <td>
+            <button class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+        </td>
                         </tr>
                     `;
                 });
@@ -757,6 +786,7 @@ window.onload = loadPackages;
                                     <th>address</th>
                                     <th>user name</th>
                                     <th>Booked</th>
+                                    <th >Remove data</th>
                                 </tr>
                             </thead>
                             <tbody id="toursTable"></tbody>
@@ -769,6 +799,40 @@ window.onload = loadPackages;
                 <script>
                     let tourPage = 1;
                     const tourPerPage = 5;
+
+                  
+
+
+// -------------------
+// 1️⃣ Global delete function
+// -------------------
+function deleteTour(id) {
+    if (!confirm('Are you sure you want to delete this booking?')) return;
+
+    const token = localStorage.getItem('token');
+
+    fetch(`/api/deletetour/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.success) {
+            alert('Tour deleted successfully!');
+            fetchTours(tourPage); // Refresh table
+        } else {
+            alert('Delete failed: ' + response.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error deleting tour.');
+    });
+}
+
                     
                     function fetchTours(page = 1) {
                         const token = localStorage.getItem('token');
@@ -795,6 +859,7 @@ window.onload = loadPackages;
                     console.error("toursTable not found");
                     return;
                 }
+     
                             tbody.innerHTML = '';
                     
                             result.data.data.forEach(tour => {
@@ -813,6 +878,9 @@ window.onload = loadPackages;
                                         <td>${tour.user ? tour.user.name : ''}</td>
 
                                         <td>${tour.booked ? 'Yes' : 'No'}</td>
+                                        <td>
+                <button class="btn btn-danger" onclick="deleteTour(${tour.id})">Delete</button>
+            </td>
                                     </tr>
                                 `;
                             });
@@ -939,241 +1007,138 @@ window.onload = loadPackages;
 
        
 
-//         const packageForm = document.getElementById('packageForm');
 
-// packageForm.addEventListener('submit', function(e) {
-//     e.preventDefault();
 
-//     const formData = new FormData();
+// //         // User Functions
+//         document.getElementById('userForm').addEventListener('submit', function(e) {
+//             e.preventDefault();
+            
+//             const newUser = {
+//                 id: users.length + 1,
+//                 name: document.getElementById('userName').value,
+//                 email: document.getElementById('userEmail').value,
+//                 phone: document.getElementById('userPhone').value,
+//                 city: document.getElementById('userCity').value,
+//                 joined: new Date().toISOString().split('T')[0]
+//             };
 
-//     formData.append('name', document.getElementById('packageName').value);
-//     formData.append('price', document.getElementById('packagePrice').value);
-//     formData.append('duration', document.getElementById('packageDuration').value);
-//     formData.append('location', document.getElementById('packageLocation').value);
-//     formData.append('description', document.getElementById('packageDescription').value);
-//     formData.append('image', document.getElementById('packageImage').files[0]);
-
-   
-//     fetch('http://127.0.0.1:8000/api/packages', {
-//         method: 'POST',
-//         body: formData   
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         if (data.status) {
-//             showToast('Package added successfully!');
-//             packageForm.reset();   
-//             loadPackages();
-//         }
-//     })
-//     .catch(err => console.log(err));
-        
-//         });
-     
-//         function loadPackages() {
-//             fetch('http://127.0.0.1:8000/api/getpackages')
-//         .then(res => res.json())
-//         .then(result => {
-//             packages = result.data;     // ✅ IMPORTANT
-//             renderPackages();
+//             users.push(newUser);
 //             updateStats();
+//             renderUsers();
 //             updateSelects();
-//         })
-//         .catch(err => console.log(err));
-     
-// }
+//             this.reset();
+//             showToast('User added successfully!');
+//         });
 
-// window.onload = loadPackages;
-
-//         function renderPackages() {
-//             const container = document.getElementById('packagesList');
-//             if (packages.length === 0) {
-//                 container.innerHTML = `
-//                     <div class="empty-state">
-//                         <div class="empty-state-icon">📦</div>
-//                         <p>No packages added yet</p>
-//                     </div>
-//                 `;
+//         function renderUsers() {
+//             const tbody = document.getElementById('usersTable');
+//             if (users.length === 0) {
+//                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No users found</td></tr>';
 //                 return;
 //             }
 
-//             container.innerHTML = packages.map(pkg => `
-//                 <div class="card">
-                    
-//           <img 
-//           src="/${pkg.image}" alt="${pkg.name}"
-//             style="
-//                 width:100%;
-//                 height:180px;
-//                 object-fit:cover;
-//                 border-radius:12px 12px 0 0;
-//                 margin-bottom:10px;
-//             "
-//       >
-//                     <div class="card-header">
-//                         <span class="card-title">${pkg.name}</span>
-//                         <span class="badge badge-success">PKR ${pkg.price.toLocaleString()}</span>
-//                     </div>
-//                     <div class="info-row">
-//                         <span class="info-label">Location:</span>
-//                         <span class="info-value">${pkg.location}</span>
-//                     </div>
-//                      <div class="info-row">
-//                          <span class="info-label">Duration:</span>
-//                        <span class="info-value">${pkg.duration} Days</span>
-//                     </div>
-//                     <div class="info-row">
-//                         <span class="info-label">Description:</span>
-//                     </div>
-                    
-//                     <p style="margin-top: 10px; color: #666;">${pkg.description}</p>
-//                     <div class="actions" style="margin-top: 15px;">
-//                         <button class="btn btn-danger" onclick="deletePackage(${pkg.id})">Delete</button>
-//                     </div>
-//                 </div>
+//             tbody.innerHTML = users.map(user => `
+//                 <tr>
+//                     <td><strong>${user.name}</strong></td>
+//                     <td>${user.email}</td>
+//                     <td>${user.phone}</td>
+//                     <td>${user.city}</td>
+//                     <td>${user.joined}</td>
+//                     <td>
+//                         <button class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+//                     </td>
+//                 </tr>
 //             `).join('');
 //         }
 
-//         function deletePackage(id) {
-//             if (confirm('Are you sure you want to delete this package?')) {
-//                 packages = packages.filter(pkg => pkg.id !== id);
+//         function deleteUser(id) {
+//             if (confirm('Are you sure you want to delete this user?')) {
+//                 users = users.filter(user => user.id !== id);
 //                 updateStats();
-//                 renderPackages();
+//                 renderUsers();
 //                 updateSelects();
-//                 showToast('Package deleted successfully!');
+//                 showToast('User deleted successfully!');
 //             }
 //         }
 
-//         // User Functions
-        document.getElementById('userForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const newUser = {
-                id: users.length + 1,
-                name: document.getElementById('userName').value,
-                email: document.getElementById('userEmail').value,
-                phone: document.getElementById('userPhone').value,
-                city: document.getElementById('userCity').value,
-                joined: new Date().toISOString().split('T')[0]
-            };
-
-            users.push(newUser);
-            updateStats();
-            renderUsers();
-            updateSelects();
-            this.reset();
-            showToast('User added successfully!');
-        });
-
-        function renderUsers() {
-            const tbody = document.getElementById('usersTable');
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No users found</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td><strong>${user.name}</strong></td>
-                    <td>${user.email}</td>
-                    <td>${user.phone}</td>
-                    <td>${user.city}</td>
-                    <td>${user.joined}</td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function deleteUser(id) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                users = users.filter(user => user.id !== id);
-                updateStats();
-                renderUsers();
-                updateSelects();
-                showToast('User deleted successfully!');
-            }
-        }
-
         // Booking Functions
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        //     e.preventDefault();
             
-            const newBooking = {
-                id: bookings.length + 1,
-                userId: parseInt(document.getElementById('bookingUser').value),
-                packageId: parseInt(document.getElementById('bookingPackage').value),
-                date: document.getElementById('bookingDate').value,
-                people: parseInt(document.getElementById('bookingPeople').value),
-                status: 'confirmed'
-            };
+        //     const newBooking = {
+        //         id: bookings.length + 1,
+        //         userId: parseInt(document.getElementById('bookingUser').value),
+        //         packageId: parseInt(document.getElementById('bookingPackage').value),
+        //         date: document.getElementById('bookingDate').value,
+        //         people: parseInt(document.getElementById('bookingPeople').value),
+        //         status: 'confirmed'
+        //     };
 
-            bookings.push(newBooking);
-            updateStats();
-            renderBookings();
-            this.reset();
-            showToast('Booking created successfully!');
-        });
+        //     bookings.push(newBooking);
+        //     updateStats();
+        //     renderBookings();
+        //     this.reset();
+        //     showToast('Booking created successfully!');
+        // });
 
-        function renderBookings() {
-            const container = document.getElementById('bookingsList');
-            if (bookings.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🎫</div>
-                        <p>No bookings yet</p>
-                    </div>
-                `;
-                return;
-            }
+        // function renderBookings() {
+        //     const container = document.getElementById('bookingsList');
+        //     if (bookings.length === 0) {
+        //         container.innerHTML = `
+        //             <div class="empty-state">
+        //                 <div class="empty-state-icon">🎫</div>
+        //                 <p>No bookings yet</p>
+        //             </div>
+        //         `;
+        //         return;
+        //     }
 
-            container.innerHTML = bookings.map(booking => {
-                const user = users.find(u => u.id === booking.userId);
-                const pkg = packages.find(p => p.id === booking.packageId);
+        //     container.innerHTML = bookings.map(booking => {
+        //         const user = users.find(u => u.id === booking.userId);
+        //         const pkg = packages.find(p => p.id === booking.packageId);
                 
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Booking #${booking.id}</span>
-                            <span class="badge badge-success">${booking.status}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Customer:</span>
-                            <span class="info-value">${user ? user.name : 'Unknown'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Package:</span>
-                            <span class="info-value">${pkg ? pkg.name : 'Unknown'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Booking Date:</span>
-                            <span class="info-value">${booking.date}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Number of People:</span>
-                            <span class="info-value">${booking.people}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Total Price:</span>
-                            <span class="info-value"><strong>PKR ${pkg ? (pkg.price * booking.people).toLocaleString() : '0'}</strong></span>
-                        </div>
-                        <div class="actions" style="margin-top: 15px;">
-                            <button class="btn btn-danger" onclick="deleteBooking(${booking.id})">Cancel</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+        //         return `
+        //             <div class="card">
+        //                 <div class="card-header">
+        //                     <span class="card-title">Booking #${booking.id}</span>
+        //                     <span class="badge badge-success">${booking.status}</span>
+        //                 </div>
+        //                 <div class="info-row">
+        //                     <span class="info-label">Customer:</span>
+        //                     <span class="info-value">${user ? user.name : 'Unknown'}</span>
+        //                 </div>
+        //                 <div class="info-row">
+        //                     <span class="info-label">Package:</span>
+        //                     <span class="info-value">${pkg ? pkg.name : 'Unknown'}</span>
+        //                 </div>
+        //                 <div class="info-row">
+        //                     <span class="info-label">Booking Date:</span>
+        //                     <span class="info-value">${booking.date}</span>
+        //                 </div>
+        //                 <div class="info-row">
+        //                     <span class="info-label">Number of People:</span>
+        //                     <span class="info-value">${booking.people}</span>
+        //                 </div>
+        //                 <div class="info-row">
+        //                     <span class="info-label">Total Price:</span>
+        //                     <span class="info-value"><strong>PKR ${pkg ? (pkg.price * booking.people).toLocaleString() : '0'}</strong></span>
+        //                 </div>
+        //                 <div class="actions" style="margin-top: 15px;">
+        //                     <button class="btn btn-danger" onclick="deleteBooking(${booking.id})">Cancel</button>
+        //                 </div>
+        //             </div>
+        //         `;
+        //     }).join('');
+        // }
 
-        function deleteBooking(id) {
-            if (confirm('Are you sure you want to cancel this booking?')) {
-                bookings = bookings.filter(booking => booking.id !== id);
-                updateStats();
-                renderBookings();
-                showToast('Booking cancelled successfully!');
-            }
-        }
+        // function deleteBooking(id) {
+        //     if (confirm('Are you sure you want to cancel this booking?')) {
+        //         bookings = bookings.filter(booking => booking.id !== id);
+        //         updateStats();
+        //         renderBookings();
+        //         showToast('Booking cancelled successfully!');
+        //     }
+        // }
 
         // Review Functions
         document.getElementById('reviewForm').addEventListener('submit', function(e) {

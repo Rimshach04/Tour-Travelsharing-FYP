@@ -37,7 +37,7 @@ signupBtn=document.querySelector("#signup"),
     });
 
    
-const apiBase = "http://127.0.0.1:8000/api";
+ const apiBase = "http://127.0.0.1:8000/api";
 
 //  Signup
 document.querySelector(".SignForm form").addEventListener("submit", async (e) => {
@@ -85,8 +85,9 @@ document.querySelector(".LoginForm form").addEventListener("submit", async (e) =
 
   const email = e.target.querySelector('input[placeholder="Enter your Email"]').value;
   const password = e.target.querySelector('input[placeholder="Enter your password"]').value;
+  const role = e.target.querySelector('#role').value;
 
-  if (!email || !password) {
+  if (!email || !password || !role) {
     alert("Please enter both email and password.");
     return;
   }
@@ -98,7 +99,7 @@ document.querySelector(".LoginForm form").addEventListener("submit", async (e) =
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password,role}),
     });
 
     const data = await res.json();
@@ -108,7 +109,7 @@ document.querySelector(".LoginForm form").addEventListener("submit", async (e) =
       // ✅ Store access token for later API calls
       localStorage.setItem("token", data.access_token);
       alert("Login successful!");
-      window.location.href = "/";
+       window.location.href = data.redirect_to;
     } else {
       alert(data.message || "Invalid credentials");
     }
@@ -184,24 +185,34 @@ document.addEventListener("DOMContentLoaded", function () {
           let packages = result.data;
           let container = document.getElementById('packageContainer');
           let html = '';
-
+          console.log("result:", result);
           packages.forEach(pkg => {
-              html += `
-                  <div class="tour-card"
-                      data-title="${pkg.name}"
-                      data-duration="${pkg.duration} Days"
-                      data-price="PKR ${pkg.price}"
-                      data-description="${pkg.description}"
-                      data-image="images${pkg.image}"
-                  >
-                  <img src="/${pkg.image}" alt="Tour Image">
+            html += `
+  <div class="tour-card">
+      <img src="/${pkg.image}" alt="Tour Image">
+      <h3>${pkg.name}</h3>
+      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
+      <button class="btn-tour" onclick="viewDetails(${pkg.id})">
+          View Details
+      </button>
+  </div>
+`;
+              // html += `
+              //     <div class="tour-card"
+              //         data-title="${pkg.name}"
+              //         data-duration="${pkg.duration} Days"
+              //         data-price="PKR ${pkg.price}"
+              //         data-description="${pkg.description}"
+              //         data-image="images${pkg.image}"
+              //     >
+              //     <img src="/${pkg.image}" alt="Tour Image">
                   
-                      <h3>${pkg.name}</h3>
-                      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
+              //         <h3>${pkg.name}</h3>
+              //         <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
                     
-                      <button class="btn-tour">View Details</button>
-                  </div>
-              `;
+              //         <button class="btn-tour">View Details</button>
+              //     </div>
+              // `;
           });
       
           container.innerHTML = html;
@@ -211,19 +222,23 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
 });
+function viewDetails(id) {
+  window.location.href = `/tourpage/${id}`;
+}
 
-document.addEventListener("click", function (e) {
+// document.addEventListener("click", function (e) {
 
-    let card = e.target.closest(".tour-card");
-    if (!card) return;
+//     let card = e.target.closest(".tour-card");
+//     if (!card) return;
 
-    let title = encodeURIComponent(card.dataset.title);
-    let duration = encodeURIComponent(card.dataset.duration);
-    let price = encodeURIComponent(card.dataset.price);
-    let description = encodeURIComponent(card.dataset.description);
+//     let title = encodeURIComponent(card.dataset.title);
+//     let duration = encodeURIComponent(card.dataset.duration);
+//     let price = encodeURIComponent(card.dataset.price);
+//     let description = encodeURIComponent(card.dataset.description);
+//     console.log("Description:", description);
 
-    window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}&description=${description}`;
-});
+//     window.location.href = `/tourpage?title=${title}&duration=${duration}&price=${price}&description=${description}`;
+// });
 
                    
   
@@ -352,15 +367,10 @@ function openEmail() {
   // Yahan apna email add karo
   let email = "rimshachoudhary.7614@gmail.com";
 
-  // Direct email compose window open karega
   let url = `mailto:${email}`;
 
   window.location.href = url;
 }
 
-// window.addEventListener("click", (e) => {
-//   if (e.target.classList.contains("popup")) {
-//     e.target.classList.remove("show");
-//   }
-// });
+
 

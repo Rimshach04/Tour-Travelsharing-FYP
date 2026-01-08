@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <h1 id="tour-title"></h1>
+  {{-- <h1 id="tour-title"></h1>
 
   <!-- <img id="tour-image">  -->
     <div class="page_p">
@@ -17,8 +17,17 @@
     </div>
     <hr>
     <h4>Description</h4>
-    <p>{{ request('description') }}</p>
-    
+    <div class="discrition">
+    {{-- <p>{{ request('description') }}</p> --}}
+    {{-- <h3>{!! nl2br(e(request('description'))) !!}</h3> --}}
+{{-- 
+  </div> --}}
+  <div class="page_p">
+  <h1>{{ $package->name }}</h1>
+<p>{{ $package->duration }} Days</p>
+<p>PKR {{ $package->price }}</p>
+<p>{{ $package->description }}</p>
+  </div>
 
    
 
@@ -31,8 +40,9 @@
   <!-- Price Box -->
   <div class="price-box">
     <h2 id="base-price"></h2>
-
-    <label>Date (put date if choose private trip)</label>
+      {{-- <h4>Prices are inclusive of all taxes.
+         Select the number of persons to see the final discounted amount.</h4> --}}
+<label>Date </label> 
     <input type="date" id="tour-date"  />
 
     <div class="counter">

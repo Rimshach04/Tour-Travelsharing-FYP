@@ -55,7 +55,8 @@
           <i class="uil uil-times  form_close"></i>
           <!-- Login form -->
           <div class="form LoginForm">
-            <form action="{{route('login')}}" method="POST">
+            {{-- <form action="{{route('login')}}" method="POST"> --}}
+            <form >
               @csrf
               <h2>Login</h2>
               <div class="input_bx">
@@ -88,7 +89,8 @@
             </div>
           <!-- sign up -->
           <div class="form SignForm">
-            <form action="{{route('signup')}}">
+            {{-- <form action="{{route('signup')}}"> --}}
+            <form >
               <h2>Sign up</h2>
               <div class="input_bx">
                 <input type="text" placeholder="Enter your name" required>
@@ -182,6 +184,19 @@
   <img src="images/next.png" alt="Next" class="nextbtn" id="nextbtn">
 </section>
   
+{{-- ******************************************************* --}}
+
+ <h2>Gallery of Memories</h2>
+    <div class="gallery">
+        <img src="https://picsum.photos/id/1011/400/300" alt="Memory 1">
+        <img src="https://picsum.photos/id/1012/400/300" alt="Memory 2">
+        <img src="https://picsum.photos/id/1013/400/300" alt="Memory 3">
+        <img src="https://picsum.photos/id/1015/400/300" alt="Memory 4">
+        <img src="https://picsum.photos/id/1016/400/300" alt="Memory 5">
+        <img src="https://picsum.photos/id/1018/400/300" alt="Memory 6">
+        <img src="https://picsum.photos/id/1020/400/300" alt="Memory 7">
+        <img src="https://picsum.photos/id/1021/400/300" alt="Memory 8">
+    </div>
 
                                <!-- ********************** -->
              <!-- feedback -->

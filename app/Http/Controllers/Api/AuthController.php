@@ -51,7 +51,7 @@ class AuthController extends Controller
     $request->headers->set('Accept', 'application/json');
 
     $request->validate([
-        'email' => 'required|email',
+        'email' => 'required|email|',
         'password' => 'required',
     ]);
 
@@ -63,34 +63,53 @@ class AuthController extends Controller
             'message' => 'Invalid email or password',
         ], 401);
     }
+  
+    
     $user = auth()->user();
+    $selectedRole = $request->role;
+
+    // 🔐 Match DB role with selected role
+    if ($user->role !== $selectedRole) {
+        return response()->json([
+            'status' => false,
+            'message' => 'You are not allowed to login as this role'
+        ], 403);
+    }
+
+    $redirect = $selectedRole === 'admin'
+        ? url('/admindashboard')
+        : url('/');
+
 
     return response()->json([
         'status' => true,
         'user' => $user,
+        'role' => $user->role,
+        'redirect_to' => $redirect,
         'access_token' => $token,
         'token_type' => 'Bearer',
     ]);
 }
 
 
-public function getUser($email)
-{
-    $user = \App\Models\Userregester::where('email', $email)->first();
 
-    if (!$user) {
-        return response()->json([
-            'status' => false,
-            'message' => 'User not found'
-        ], 404);
-    }
+// public function getUser($email)
+// {
+//     $user = \App\Models\Userregester::where('email', $email)->first();
 
-    return response()->json([
-        'status' => true,
-        'message' => 'User info fetched successfully',
-        'data' => $user
-    ], 200);
-}
+//     if (!$user) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'User not found'
+//         ], 404);
+//     }
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => 'User info fetched successfully',
+//         'data' => $user
+//     ], 200);
+// }
 
 public function getUsers(Request $request)
 {
@@ -104,11 +123,9 @@ public function getUsers(Request $request)
     ], 200);
 }
 
-
-
-public function deleteUser($email)
+public function deleteUser($id)
 {
-    $user = \App\Models\Userregester::where('email', $email)->first();
+    $user = Userregester::find($id); // find by ID
 
     if (!$user) {
         return response()->json([
@@ -124,6 +141,7 @@ public function deleteUser($email)
         'message' => 'User deleted successfully'
     ], 200);
 }
+
 
 
 }

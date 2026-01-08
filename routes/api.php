@@ -17,25 +17,22 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/user/{email}', [AuthController::class, 'getUser']);
 Route::get('users', [AuthController::class, 'getUsers']);
 
-Route::delete('/user/{email}', [AuthController::class, 'deleteUser']);
+Route::delete('/user/{id}', [AuthController::class, 'deleteUser']);
 
 
 
 
 Route::post('/create-tour', [TourController::class, 'createTour'])->middleware(MyJWTMiddleware::class);
 Route::get('/get-tours', [TourController::class, 'getTours'])->middleware(MyJWTMiddleware::class);
-Route::delete('/delete-tour/{id}', [TourController::class, 'deleteTour'])->middleware(MyJWTMiddleware::class);
+Route::delete('/deletetour/{id}', [TourController::class, 'deleteTour'])->middleware(MyJWTMiddleware::class);
 
 
 
-
-// Route::get('/rides', [RideController::class, 'index']); // List all rides
-// Route::post('/bookride', [BookingController::class, 'store']); 
- Route::post('/book-ride', [RideController::class, 'store'])->name('bookride')->middleware(MyJWTMiddleware::class);;
 
 
 Route::post('/feedback', [FeedbackController::class, 'storefeedback'])->middleware(MyJWTMiddleware::class);
  Route::get('/feedback', [FeedbackController::class, 'getfeedback']);
+ Route::delete('/feedback/{id}', [FeedbackController::class, 'deleteFeedback']);
 
 
 

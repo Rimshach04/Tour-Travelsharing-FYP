@@ -45,6 +45,12 @@ class PackageController extends Controller
     ]);
     }
 
+    public function show($id)
+{
+    $package = Package::findOrFail($id);
+    return view('tourpage', compact('package'));
+}
+
     public function destroy($id)
 {
     // Find package by ID

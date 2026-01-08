@@ -73,12 +73,7 @@ class TourController extends Controller
                 'message' => 'Token not valid.'
             ], 401);
         }
-    
-        $perPage = $request->get('per_page', 5); // default 5 records
-    
-        // $tours = TourBooking::where('user_id', $userId)
-        //             ->orderBy('id', 'desc')
-        //             ->paginate($perPage);
+        $perPage = $request->get('per_page', 5);
         $tours = TourBooking::with('user')  // 🔹 Add this
             ->where('user_id', $userId)
             ->orderBy('id', 'desc')
@@ -89,21 +84,6 @@ class TourController extends Controller
          'data' => $tours
              ], 200);
     
-        // $user =  $request->auth_user->id;
-
-        // if (!$user) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Token not valid.'
-        //     ], 401);
-        // }
-
-        // $tours = TourBooking::where('user_id', $user)->get();
-
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => $tours
-        // ]);
     }
     
     public function deleteTour(Request $request, $id)
