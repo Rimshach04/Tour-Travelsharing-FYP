@@ -22,12 +22,13 @@
     {{-- <h3>{!! nl2br(e(request('description'))) !!}</h3> --}}
 {{-- 
   </div> --}}
-  <div class="page_p">
+ 
   <h1>{{ $package->name }}</h1>
+ 
 <p>{{ $package->duration }} Days</p>
 <p>PKR {{ $package->price }}</p>
+
 <p>{{ $package->description }}</p>
-  </div>
 
    
 
