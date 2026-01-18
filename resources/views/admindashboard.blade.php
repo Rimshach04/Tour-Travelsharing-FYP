@@ -327,7 +327,7 @@
         }
 
         table {
-            width: 90%;
+            width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -452,6 +452,40 @@
             display: block;
         }
     </style>
+      <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+
+      <style>
+          /* Quill styling to match your form inputs */
+          #packageDescriptionEditor {
+              border: 2px solid var(--border);
+              border-radius: 8px;
+              background: #fff;
+  
+              min-height: 320px;
+              resize: vertical;
+              overflow: auto;
+          }
+  
+          #packageDescriptionEditor .ql-toolbar {
+              border: none;
+              border-bottom: 2px solid var(--border);
+              border-radius: 8px 8px 0 0;
+          }
+  
+          #packageDescriptionEditor .ql-container {
+              border: none;
+              border-radius: 0 0 8px 8px;
+              font-family: 'DM Sans', sans-serif;
+              font-size: 15px;
+  
+              min-height: 260px;
+          }
+  
+          #packageDescriptionEditor:focus-within {
+              border-color: var(--secondary);
+              box-shadow: 0 0 0 3px rgba(0, 78, 137, 0.1);
+          }
+      </style>
 </head>
 <body>
     <div class="container">
@@ -529,13 +563,20 @@
                                 </div>
                                 <div class="form-group full-width">
                                     <label>Description</label>
-                                    <textarea id="packageDescription" required></textarea>
+                                      <!-- Quill editor -->
+                                      <div id="packageDescriptionEditor"></div>
+
+                                      <!-- Hidden input (optional, but good for validation/debug) -->
+                                      <input type="hidden" id="packageDescription" required>
+                                  </div>
+  
+                                    {{-- <textarea id="packageDescription" required></textarea> --}}
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Add Package</button>
                         </form>
-                    </div>
-
+                    {{-- </div> --}}
+         
                     <div id="packagesList" class="grid"></div>
                 </div>
 
@@ -550,6 +591,15 @@ packageForm.addEventListener('submit', function(e) {
     formData.append('location', document.getElementById('packageLocation').value);
     formData.append('description', document.getElementById('packageDescription').value);
     formData.append('image', document.getElementById('packageImage').files[0]);
+ 
+    const descriptionHtml = quill.root.innerHTML;
+
+                        const cleanDesc = (descriptionHtml === '<p><br></p>') ? '' : descriptionHtml;
+
+                        document.getElementById('packageDescription').value = cleanDesc; // keep hidden input updated (optional)
+                        formData.append('description', cleanDesc);
+
+                        formData.append('image', document.getElementById('packageImage').files[0]);
 
 
     fetch('http://127.0.0.1:8000/api/packages', {
@@ -1239,5 +1289,38 @@ function deleteTour(id) {
         // Initialize
         // initializeSampleData();
     </script>
+
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+<script>
+    // Initialize Quill
+    const quill = new Quill('#packageDescriptionEditor', {
+        theme: 'snow',
+        placeholder: 'Write package description...',
+        modules: {
+            toolbar: [
+                [{
+                    header: [1, 2, 3, false]
+                }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{
+                    color: []
+                }, {
+                    background: []
+                }],
+                [{
+                    list: 'ordered'
+                }, {
+                    list: 'bullet'
+                }],
+                [{
+                    align: []
+                }],
+                ['link', 'blockquote', 'code-block'],
+                ['clean']
+            ]
+        }
+    });
+</script>
 </body>
 </html>

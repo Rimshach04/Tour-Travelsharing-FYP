@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
   <div class="tour-card">
       <img src="/${pkg.image}" alt="Tour Image">
       <h3>${pkg.name}</h3>
-      <p>🕒 ${pkg.duration} Days | PKR ${pkg.price}</p>
+      <p>🕒 ${pkg.duration} Days | Per head ${pkg.price}</p>
       <button class="btn-tour" onclick="viewDetails(${pkg.id})">
           View Details
       </button>
